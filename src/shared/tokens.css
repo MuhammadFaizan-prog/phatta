@@ -1,0 +1,22 @@
+@layer base, components, utilities;
+/* Shared panj tokens. Every skin imports this, then its own src/tokens.css.
+   Skin-specific values override these under [data-skin="<slug>"]. */
+.media-skin[data-skin] {
+  --panj-target-min: 44px;          /* challenge gate: touch targets */
+  --panj-focus-width: 2px;
+  --panj-focus-offset: 2px;
+  --panj-focus-color: #fff;
+  --panj-focus-halo: rgb(0 0 0 / 0.8); /* second ring so focus shows over bright video */
+  --panj-motion-fast: 120ms;
+  --panj-motion-base: 200ms;
+  --panj-motion-slow: 400ms;
+  --panj-scrim: linear-gradient(to top, rgb(0 0 0 / 0.65), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-skin[data-skin] {
+    --panj-motion-fast: 0ms;
+    --panj-motion-base: 0ms;
+    --panj-motion-slow: 0ms;
+  }
+}

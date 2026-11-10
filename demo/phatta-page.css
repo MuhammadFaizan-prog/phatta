@@ -1,0 +1,523 @@
+/* /phatta page: the back of the truck.
+   The truck is a raster plate cut from our own AI-generated reference art (night and day), shown at its exact aspect
+   ratio and scaled as one unit. Everything on top (nav hit areas, the live player, bells, lights) is positioned in
+   plate pixels through --W/--H, so it stays registered at any size. Phones get cropped pieces of the same plate. */
+
+@layer phatta-page {
+  :root {
+    color-scheme: dark;
+    background: #060f18;
+  }
+
+  :root[data-mode="day"] {
+    color-scheme: light;
+    background: #2a1d16;
+  }
+
+  .ph-page {
+    margin: 0;
+    color: #efe3c7;
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  .ph-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ── hero: the plate, centred, with the edge colours carried out to the sides ── */
+  .ph-hero {
+    position: relative;
+    background: #060f18;
+    overflow: hidden;
+  }
+
+  :root[data-mode="day"] .ph-hero {
+    background: linear-gradient(
+      180deg,
+      rgb(200 199 202) 0%,
+      rgb(212 194 188) 12.5%,
+      rgb(227 189 170) 25%,
+      rgb(212 177 159) 37.5%,
+      rgb(104 73 59) 50%,
+      rgb(30 20 15) 62.5%,
+      rgb(97 71 55) 75%,
+      rgb(55 47 43) 100%
+    );
+  }
+
+  .ph-plate {
+    --W: 1376;
+    --H: 768;
+    --vx: 429;
+    --vy: 198;
+    --vw: 519;
+    --vh: 260;
+    position: relative;
+    width: min(100%, calc(100svh * var(--W) / var(--H)));
+    min-width: 700px;
+    margin-inline: auto;
+    aspect-ratio: var(--W) / var(--H);
+    container-type: inline-size;
+    background: image-set(url("./assets/night/plate@1x.webp") 1x, url("./assets/night/plate@2x.webp") 2x) 0 0 / 100% 100% no-repeat;
+  }
+
+  :root[data-mode="day"] .ph-plate {
+    --W: 1312;
+    --H: 816;
+    --vx: 422;
+    --vy: 214;
+    --vw: 469;
+    --vh: 268;
+    background-image: image-set(url("./assets/day/plate@1x.webp") 1x, url("./assets/day/plate@2x.webp") 2x);
+  }
+
+  /* place a child at plate rect --x --y --w --h */
+  .ph-plate > :where(*),
+  .ph-nav > :where(*) {
+    position: absolute;
+    left: calc(var(--x, 0) / var(--W) * 100cqw);
+    top: calc(var(--y, 0) / var(--W) * 100cqw);
+    width: calc(var(--w, 0) / var(--W) * 100cqw);
+    height: calc(var(--h, 0) / var(--W) * 100cqw);
+  }
+
+  .ph-nav {
+    --x: 0;
+    --y: 0;
+    --w: var(--W);
+    --h: 60;
+    z-index: 6;
+  }
+
+  /* the live player sits on the painted video rectangle */
+  #stage {
+    --x: var(--vx);
+    --y: var(--vy);
+    --w: var(--vw);
+    --h: var(--vh);
+    --phatta-k: calc(100cqw / var(--W));
+    aspect-ratio: auto;
+    background: #000;
+    z-index: 4;
+  }
+
+  #stage video-player,
+  #stage .media-skin {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── nav: invisible hit areas over the painted words (the paint is the label) ── */
+  .ph-nav a {
+    display: block;
+    min-height: 44px;
+    translate: 0 calc(min(0px, (var(--h) / var(--W) * 100cqw - 44px) / 2));
+    color: transparent;
+    font: 0/0 a;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .ph-nav a:hover {
+    box-shadow: inset 0 -2px 0 rgb(242 184 75 / 0.85);
+  }
+
+  .ph-nav a:focus-visible,
+  .ph-mode:focus-visible {
+    outline: 3px solid #fff4cc;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 7px rgb(0 0 0 / 0.85);
+  }
+
+  .ph-logo { --x: 38; --y: 9; --w: 96; --h: 32; }
+  .ph-link-skins { --x: 1150; --y: 9; --w: 46; --h: 32; }
+  .ph-link-about { --x: 1209; --y: 9; --w: 56; --h: 32; }
+  .ph-link-github { --x: 1276; --y: 9; --w: 64; --h: 32; }
+  :root[data-mode="day"] .ph-logo { --x: 30; --y: 9; --w: 96; --h: 32; }
+  :root[data-mode="day"] .ph-link-skins { --x: 1086; --y: 10; --w: 51; --h: 32; }
+  :root[data-mode="day"] .ph-link-about { --x: 1151; --y: 10; --w: 57; --h: 32; }
+  :root[data-mode="day"] .ph-link-github { --x: 1221; --y: 10; --w: 66; --h: 32; }
+
+  /* day/night toggle: the one control the plate does not paint */
+  .ph-mode {
+    --x: 1100;
+    --y: 3;
+    --w: 44;
+    --h: 44;
+    min-width: 44px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #cfc4ad;
+    cursor: pointer;
+  }
+
+  :root[data-mode="day"] .ph-mode {
+    --x: 1036;
+    --y: 4;
+    color: #fbf3e2;
+  }
+
+  .ph-mode svg {
+    grid-area: 1 / 1;
+    width: calc(17 / var(--W) * 100cqw);
+    height: calc(17 / var(--W) * 100cqw);
+    min-width: 14px;
+    min-height: 14px;
+  }
+
+  .ph-mode:hover {
+    color: #f2b84b;
+  }
+
+  :root:not([data-mode="day"]) .ph-mode-moon,
+  :root[data-mode="day"] .ph-mode-sun {
+    display: none;
+  }
+
+  /* ── bells: a separate layer cut from the plate, swaying from the rail ── */
+  .ph-bells {
+    --x: 398;
+    --y: 602;
+    --w: 590;
+    --h: 160;
+    z-index: 2;
+    pointer-events: none;
+    background: image-set(url("./assets/night/bells@1x.webp") 1x, url("./assets/night/bells@2x.webp") 2x) 0 0 / 100% 100% no-repeat;
+    transform-origin: 50% 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+
+  :root[data-mode="day"] .ph-bells {
+    --x: 352;
+    --y: 634;
+    --w: 615;
+    --h: 170;
+    background-image: image-set(url("./assets/day/bells@1x.webp") 1x, url("./assets/day/bells@2x.webp") 2x);
+  }
+
+  /* ── night lights: LED twinkle and headlight glow ── */
+  .ph-leds {
+    --x: 0;
+    --y: 0;
+    --w: var(--W);
+    --h: var(--H);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .ph-leds i {
+    position: absolute;
+    left: calc((var(--x) - 9) / var(--W) * 100cqw);
+    top: calc((var(--y) - 9) / var(--W) * 100cqw);
+    width: calc(18 / var(--W) * 100cqw);
+    height: calc(18 / var(--W) * 100cqw);
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c) 85%, white) 0, color-mix(in srgb, var(--c) 55%, transparent) 35%, transparent 70%);
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+
+  :root[data-mode="day"] .ph-leds,
+  :root[data-mode="day"] .ph-glow {
+    display: none;
+  }
+
+  .ph-glow {
+    --x: 560;
+    --y: 560;
+    --w: 480;
+    --h: 208;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(closest-side at 46% 32%, rgb(255 248 220 / 0.9), rgb(255 240 200 / 0.25) 45%, transparent),
+      radial-gradient(closest-side at 56% 33%, rgb(255 248 220 / 0.9), rgb(255 240 200 / 0.25) 45%, transparent);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .ph-plate[data-playing] .ph-glow {
+    opacity: 0.45;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ph-plate:is(:hover, [data-playing]) .ph-bells {
+      animation: ph-sway 2.6s ease-in-out infinite;
+    }
+
+    :root:not([data-mode="day"]) .ph-leds i {
+      animation: ph-twinkle 3.2s ease-in-out infinite;
+      animation-delay: calc(var(--n) * -0.53s);
+    }
+  }
+
+  @keyframes ph-sway {
+    0%, 100% { transform: skewX(0deg); }
+    25% { transform: skewX(1.6deg); }
+    75% { transform: skewX(-1.6deg); }
+  }
+
+  @keyframes ph-twinkle {
+    0%, 60%, 100% { opacity: 0; }
+    75% { opacity: 0.55; }
+  }
+
+  /* phone-only pieces stay hidden on the plate */
+  .ph-crown,
+  .ph-flaps {
+    display: none;
+  }
+
+  /* ── workshop / design thinking ── */
+  .ph-workshop {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 72px 32px 96px;
+    scroll-margin-top: 24px;
+  }
+
+  .ph-workshop:focus {
+    outline: none;
+  }
+
+  .ph-workshop:focus-visible {
+    outline: 3px solid #fff4cc;
+  }
+
+  .ph-workshop-art {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    box-shadow: 0 18px 48px rgb(0 0 0 / 0.55);
+  }
+
+  .ph-workshop-text h2 {
+    margin: 0 0 12px;
+    color: #f2b84b;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+  }
+
+  .ph-workshop-text p {
+    margin: 0 0 14px;
+    line-height: 1.6;
+    font-size: 17px;
+  }
+
+  .ph-workshop-text a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: #f2b84b;
+  }
+
+  :root[data-mode="day"] .ph-workshop {
+    color: #f6ead2;
+  }
+
+  /* ── phones (< 700px): crown crop as header, video full width, live strip, mudflap crops as footer ── */
+  @media (max-width: 699.98px) {
+    :root[data-mode] .ph-plate {
+      background: none;
+    }
+
+    :root[data-mode="day"] .ph-nav a,
+    :root[data-mode="day"] .ph-mode {
+      color: #3b2416;
+    }
+
+    .ph-plate {
+      width: 100%;
+      min-width: 0;
+      aspect-ratio: auto;
+      container-type: inline-size;
+      display: flex;
+      flex-direction: column;
+      background: none;
+      padding-bottom: 12px;
+    }
+
+    .ph-plate > :where(*),
+    .ph-nav > :where(*) {
+      position: static;
+      width: auto;
+      height: auto;
+    }
+
+    .ph-nav {
+      order: 0;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 8px;
+      font-size: 15px;
+    }
+
+    .ph-nav a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 6px;
+      translate: none;
+      color: #e6dac0;
+      font: 15px/1 Georgia, "Times New Roman", serif;
+    }
+
+    .ph-logo {
+      margin-right: auto;
+      font-family: system-ui, sans-serif !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em;
+    }
+
+    .ph-mode {
+      width: 44px;
+      height: 44px;
+      order: 5;
+    }
+
+    .ph-mode svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .ph-crown {
+      display: block;
+      order: 1;
+      width: 100%;
+      aspect-ratio: 1076 / 150;
+      background: image-set(url("./assets/night/plate@1x.webp") 1x, url("./assets/night/plate@2x.webp") 2x) no-repeat;
+      background-size: calc(1376 / 1076 * 100%) auto;
+      background-position: calc(150 / (1376 - 1076) * 100%) 0;
+    }
+
+    /* the plate's painted nav words sit in the crop's top-right corner: cover them with the sky colour */
+    .ph-crown {
+      position: relative;
+    }
+
+    .ph-crown::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 9%;
+      height: 30%;
+      background: linear-gradient(90deg, transparent, #0c1622 40%);
+    }
+
+    :root[data-mode="day"] .ph-crown::after {
+      width: 13%;
+      background: linear-gradient(90deg, transparent, #cdc3c4 30%);
+    }
+
+    :root[data-mode="day"] .ph-crown {
+      aspect-ratio: 1140 / 160;
+      background-image: image-set(url("./assets/day/plate@1x.webp") 1x, url("./assets/day/plate@2x.webp") 2x);
+      background-size: calc(1312 / 1140 * 100%) auto;
+      background-position: calc(80 / (1312 - 1140) * 100%) 0;
+    }
+
+    #stage {
+      order: 2;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin-bottom: var(--ph-strip-h, 150px);
+      --phatta-k: 0.86px;
+    }
+
+    .ph-bells,
+    .ph-leds,
+    .ph-glow {
+      display: none !important;
+    }
+
+    .ph-flaps {
+      order: 3;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 8px 0;
+    }
+
+    .ph-flap {
+      display: block;
+      width: calc(50% - 4px);
+      aspect-ratio: 215 / 120;
+      border-radius: 6px;
+      background: image-set(url("./assets/night/plate@1x.webp") 1x, url("./assets/night/plate@2x.webp") 2x) no-repeat;
+      background-size: calc(1376 / 215 * 100%) auto;
+    }
+
+    .ph-flap-l { background-position: calc(150 / (1376 - 215) * 100%) calc(585 / (768 - 120) * 100%); }
+    .ph-flap-r { background-position: calc(1010 / (1376 - 215) * 100%) calc(585 / (768 - 120) * 100%); }
+
+    :root[data-mode="day"] .ph-flap {
+      aspect-ratio: 230 / 115;
+      background-image: image-set(url("./assets/day/plate@1x.webp") 1x, url("./assets/day/plate@2x.webp") 2x);
+      background-size: calc(1312 / 230 * 100%) auto;
+    }
+
+    :root[data-mode="day"] .ph-flap-l { background-position: calc(95 / (1312 - 230) * 100%) calc(625 / (816 - 115) * 100%); }
+    :root[data-mode="day"] .ph-flap-r { background-position: calc(985 / (1312 - 230) * 100%) calc(625 / (816 - 115) * 100%); }
+
+    .ph-workshop {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 32px 16px 56px;
+    }
+
+    .ph-workshop-text h2 {
+      font-size: 24px;
+    }
+
+    .ph-workshop-text p {
+      font-size: 16px;
+    }
+  }
+}
+
+/* Unlayered on purpose: beats the shared gallery.css #stage defaults (16:9, full width), which are unlayered too. */
+.ph-plate > #stage {
+  position: absolute;
+  left: calc(var(--vx) / var(--W) * 100cqw);
+  top: calc(var(--vy) / var(--W) * 100cqw);
+  width: calc(var(--vw) / var(--W) * 100cqw);
+  height: calc(var(--vh) / var(--W) * 100cqw);
+  aspect-ratio: auto;
+}
+
+@media (max-width: 699.98px) {
+  .ph-plate > #stage {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@layer phatta-page {
+  .ph-workshop-text code { overflow-wrap: anywhere; font-size: 0.9em; }
+}

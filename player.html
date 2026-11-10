@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" data-phatta-theme="desk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Phatta player · Video.js v10 skin</title>
+    <meta name="description" content="The Phatta Video.js v10 skin on its own: truck-art lacquer strip, rainbow bead seek bar, brass bells." />
+    <style>
+      @layer base, base.theme, base.preset, base.preferences, components, utilities, phatta, phatta-page;
+    </style>
+    <link rel="stylesheet" href="/demo/gallery.css" />
+    <link rel="stylesheet" href="/demo/phatta-player.css" />
+  </head>
+  <body class="pp-page">
+    <a class="pp-back" href="/">← Back to the truck</a>
+    <main>
+      <h1 class="pp-sr">Phatta: the player on its own</h1>
+      <div class="pp-plate" data-phatta-plate>
+        <div id="stage"></div>
+      </div>
+    </main>
+    <script type="module">
+      import '@videojs/html/i18n';
+      import { createSkinnedPlayer } from '/src/index.ts';
+      import { mount } from '/demo/mount.ts';
+      mount(createSkinnedPlayer);
+      // phones: the strip hangs under the video
+      const plate = document.querySelector('.pp-plate');
+      const wide = matchMedia('(min-width: 700px)');
+      const layout = () => { plate.toggleAttribute('data-phatta-plate', wide.matches); plate.toggleAttribute('data-phatta-below', !wide.matches); };
+      layout();
+      wide.addEventListener('change', layout);
+    </script>
+  </body>
+</html>

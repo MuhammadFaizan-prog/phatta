@@ -1,0 +1,33 @@
+{
+  "name": "phatta",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Phatta: a Pakistani truck-art skin for the Video.js v10 player (HTML custom elements + CSS).",
+  "author": "Muhammad Faizan",
+  "repository": { "type": "git", "url": "https://github.com/MuhammadFaizan-prog/phatta.git" },
+  "packageManager": "pnpm@10.14.0",
+  "engines": { "node": ">=20" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./skin.html": "./src/video/skin.html"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@videojs/html": "10.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "^22.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}

@@ -1,0 +1,838 @@
+/* Phatta: Pakistani truck art, as a Video.js v10 skin.
+
+   The paint is raster: sprites cut from Faizi's reference plates (our own AI-generated art, Apache-2.0 with the repo):
+   the crystal-bead seek strips, brass ball, cream time tag, brass-ringed buttons and their painted icons, the volume
+   rail and the lacquer strip. Text (time, tag, speed) stays live, in fonts matched to the painted numerals.
+
+   Two layouts share every rule below:
+   - flow (default): a self-contained strip at the bottom of the player (phones, fullscreen, any embed);
+   - plate: inside an ancestor with [data-phatta-plate], each control sits exactly on its painted spot of the truck
+     plate (night or day). The page puts the media container on the plate's video rectangle and sets --phatta-k
+     (CSS px per plate px); phatta-geometry.css holds the measured positions.
+
+   Layering: Scaffold styles are @layer components, the shared panj essentials @layer utilities; this is @layer phatta,
+   declared after both. Paint sits in `not (forced-colors: active)` so forced-colours keeps the Scaffold's styling.
+   Hit areas never drop below --panj-target-min (44px): painted buttons smaller than that get an invisible margin. */
+
+@property --phatta-k {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 1px;
+}
+
+@font-face {
+  font-family: "Phatta Numerals";
+  src: url("../assets/fonts/ss700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Phatta Desk";
+  src: url("../assets/fonts/rc700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Phatta Tag";
+  src: url("../assets/fonts/inter500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: block;
+}
+
+@layer phatta {
+  .media-skin[data-skin="phatta"] {
+    --k: var(--phatta-k);
+    --phatta-cream: #f3e6c8;
+    --phatta-ink: #3a2e22;
+    --phatta-gold: #f2b84b;
+    --phatta-lacquer: #0d0a08;
+    --phatta-lacquer-2: #1d1712;
+    --phatta-brass: #c99a3b;
+    --phatta-red: #c8261c;
+    --phatta-num-font: "Phatta Numerals", "Source Serif 4", Georgia, "Times New Roman", serif;
+    --phatta-tag-font: "Phatta Tag", Inter, system-ui, sans-serif;
+    --phatta-sign-font: var(--phatta-num-font);
+    --media-object-fit: cover;
+    font-family: system-ui, sans-serif;
+
+    /* per-button geometry (plate px), picked from phatta-geometry.css */
+    & .phatta-play {
+      --b-cx: var(--g-play-cx); --b-cy: var(--g-play-cy); --b-d: var(--g-play-d);
+      --b-ix: var(--g-play-ix); --b-iy: var(--g-play-iy); --b-iw: var(--g-play-iw); --b-ih: var(--g-play-ih);
+      --b-ring: var(--phatta-ring-play); --b-ring-size: var(--g-ring-play);
+    }
+    & .media-mute-button {
+      --b-cx: var(--g-vol-cx); --b-cy: var(--g-vol-cy); --b-d: var(--g-vol-d);
+      --b-ix: var(--g-vol-ix); --b-iy: var(--g-vol-iy); --b-iw: var(--g-vol-iw); --b-ih: var(--g-vol-ih);
+    }
+    & .media-captions-button {
+      --b-cx: var(--g-cc-cx); --b-cy: var(--g-cc-cy); --b-d: var(--g-cc-d);
+      --b-ix: var(--g-cc-ix); --b-iy: var(--g-cc-iy); --b-iw: var(--g-cc-iw); --b-ih: var(--g-cc-ih);
+    }
+    & .phatta-speed-button {
+      --b-cx: var(--g-rate-cx); --b-cy: var(--g-rate-cy); --b-d: var(--g-rate-d);
+      --b-ix: var(--g-rate-ix); --b-iy: var(--g-rate-iy); --b-iw: var(--g-rate-iw); --b-ih: var(--g-rate-ih);
+    }
+    & .media-pip-button {
+      --b-cx: var(--g-pip-cx); --b-cy: var(--g-pip-cy); --b-d: var(--g-pip-d);
+      --b-ix: var(--g-pip-ix); --b-iy: var(--g-pip-iy); --b-iw: var(--g-pip-iw); --b-ih: var(--g-pip-ih);
+      --b-ring: none;
+    }
+    & .media-fullscreen-button {
+      --b-cx: var(--g-fs-cx); --b-cy: var(--g-fs-cy); --b-d: var(--g-fs-d);
+      --b-ix: var(--g-fs-ix); --b-iy: var(--g-fs-iy); --b-iw: var(--g-fs-iw); --b-ih: var(--g-fs-ih);
+    }
+
+    /* never hide the strip while keyboard focus is inside it */
+    & .video-controls-content:has(:focus-visible) .video-controls-bottom {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    & .media-dialog-close {
+      min-width: var(--panj-target-min);
+      min-height: var(--panj-target-min);
+    }
+
+    & :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item) {
+      min-height: var(--panj-target-min);
+    }
+  }
+
+  /* ─────────────────────────── paint (both layouts) ─────────────────────────── */
+  @media not (forced-colors: active) {
+    .media-skin[data-skin="phatta"] {
+      & .video-controls-backdrop {
+        background-image: linear-gradient(to top, rgb(5 4 3 / 0.7), transparent 40%);
+      }
+
+      /* ── crystal-bead seek bar: silver strip underneath, gold strip clipped to the played part ── */
+      & .media-time-slider {
+        height: var(--panj-target-min);
+        min-width: 0;
+      }
+
+      & .media-time-slider-track {
+        height: calc(var(--g-th) * var(--k));
+        top: 50%;
+        translate: 0 -50%;
+        border-radius: 0;
+        overflow: visible;
+        background-color: transparent;
+        background-repeat: repeat-x;
+        background-position: 0 0;
+        background-size: calc(var(--g-tw) * var(--k)) 100%;
+      }
+
+      & .media-time-slider-track::before,
+      & .media-time-slider-buffer {
+        display: none;
+      }
+
+      & .media-time-slider-chapter,
+      & .media-time-slider-chapters {
+        display: contents;
+      }
+
+      & .media-time-slider-fill {
+        inset: 0;
+        right: 0;
+        left: 0;
+        background-color: transparent;
+        background-repeat: repeat-x;
+        background-position: 0 0;
+        background-size: calc(var(--g-tw) * var(--k)) 100%;
+        clip-path: inset(0 calc(100% - var(--media-slider-fill, 0%)) 0 0);
+      }
+
+      & .media-time-slider[data-dragging] .media-time-slider-fill {
+        right: 0;
+        clip-path: inset(0 calc(100% - var(--media-slider-pointer, 0%)) 0 0);
+      }
+
+      /* brass ball playhead (sprite); the slider root keeps the 44px hit area */
+      & .media-time-slider-thumb {
+        top: calc(50% - var(--g-th) * var(--k) / 2 + var(--g-bdy) * var(--k));
+        left: var(--media-slider-fill, 0%);
+        width: calc(var(--g-bw) * var(--k));
+        height: calc(var(--g-bh) * var(--k));
+        margin-left: calc(var(--g-bdx) * var(--k));
+        transform: none;
+        border: 0;
+        border-radius: 50%;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        z-index: 3;
+      }
+
+      & .media-time-slider[data-dragging] .media-time-slider-thumb {
+        left: var(--media-slider-pointer, 0%);
+      }
+
+      /* cream time tag riding above the ball (live current time) */
+      & .phatta-tag {
+        position: absolute;
+        z-index: 4;
+        left: clamp(calc(var(--g-cdx) * -1 * var(--k)), var(--media-slider-fill, 0%), calc(100% - (var(--g-cw) + var(--g-cdx)) * var(--k)));
+        top: calc(50% - var(--g-th) * var(--k) / 2 + var(--g-cdy) * var(--k));
+        width: calc(var(--g-cw) * var(--k));
+        height: calc(var(--g-ch) * var(--k));
+        margin-left: calc(var(--g-cdx) * var(--k));
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        pointer-events: none;
+        transition: opacity var(--panj-motion-fast, 0.12s) ease;
+      }
+
+      & .media-time-slider[data-dragging] .phatta-tag {
+        left: clamp(calc(var(--g-cdx) * -1 * var(--k)), var(--media-slider-pointer, 0%), calc(100% - (var(--g-cw) + var(--g-cdx)) * var(--k)));
+      }
+
+      & .media-time-slider[data-pointing]:not([data-dragging]) .phatta-tag {
+        opacity: 0;
+      }
+
+      & :is(.phatta-tag-time, .media-time-slider-value) {
+        font-family: var(--phatta-tag-font);
+        font-weight: 500;
+        font-size: calc(var(--g-tag-fs, 11.5) * var(--k));
+        letter-spacing: calc(var(--g-tag-ls, 0) * var(--k));
+        font-variant-numeric: tabular-nums;
+        color: var(--phatta-ink);
+        line-height: 1;
+      }
+
+      & .phatta-tag-time {
+        position: absolute;
+        left: calc(var(--g-ctx) * var(--k));
+        top: calc(var(--g-cty) * var(--k) + var(--g-tag-dy, 0) * var(--k));
+        width: calc(var(--g-ctw) * var(--k));
+        height: calc(var(--g-cth) * var(--k));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        translate: calc(var(--g-tag-dx, 0) * var(--k)) 0;
+      }
+
+      /* pointer preview: the same tag, at the pointer */
+      & .media-time-slider-preview {
+        position: absolute;
+        left: var(--media-slider-pointer, 0%);
+        top: calc(50% - var(--g-th) * var(--k) / 2 + var(--g-cdy) * var(--k));
+        bottom: auto;
+        margin-left: calc(var(--g-cdx) * var(--k));
+        translate: none;
+        transform: none;
+        max-width: none;
+        gap: 0;
+        z-index: 5;
+      }
+
+      & .media-slider-thumbnail:not(:has(img[src])) {
+        display: none;
+      }
+
+      & .media-time-slider-preview-meta {
+        width: calc(var(--g-cw) * var(--k));
+        height: calc(var(--g-ch) * var(--k));
+        padding: calc(var(--g-cty) * var(--k)) 0 0 calc(var(--g-ctx) * var(--k));
+        box-sizing: border-box;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+
+      & .media-time-slider-preview-label {
+        width: calc(var(--g-ctw) * var(--k));
+        height: calc(var(--g-cth) * var(--k));
+        justify-content: center;
+      }
+
+      & .media-time-slider-chapter-title:empty {
+        display: none;
+      }
+
+      /* ── round brass buttons: painted icon sprites; alternate states use the cream SVG family ── */
+      & .video-controls-content .media-button {
+        width: max(var(--panj-target-min), calc(var(--b-d, 38) * var(--k)));
+        height: max(var(--panj-target-min), calc(var(--b-d, 38) * var(--k)));
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        color: var(--phatta-cream);
+        background: var(--b-ring, var(--phatta-ring-btn)) center / calc(var(--b-ring-size, var(--g-ring-btn)) * var(--k)) no-repeat;
+        transition: scale var(--panj-motion-fast, 0.12s) ease;
+      }
+
+      & .video-controls-content .media-button::before {
+        content: "";
+        position: absolute;
+        left: calc(50% + var(--b-ix) * var(--k));
+        top: calc(50% + var(--b-iy) * var(--k));
+        width: calc(var(--b-iw) * var(--k));
+        height: calc(var(--b-ih) * var(--k));
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        pointer-events: none;
+      }
+
+      /* gold glow ring, like the painted play button: hover, pressed, open, captions on */
+      & .video-controls-content .media-button::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: calc(var(--b-d, 38) * var(--k) - 4 * var(--k));
+        height: calc(var(--b-d, 38) * var(--k) - 4 * var(--k));
+        translate: -50% -50%;
+        border-radius: 50%;
+        pointer-events: none;
+        box-shadow: 0 0 0 0 transparent;
+        transition: box-shadow var(--panj-motion-fast, 0.12s) ease;
+      }
+
+      & .video-controls-content .media-button:is(:hover, [aria-expanded="true"], .media-captions-button[data-active])::after {
+        box-shadow:
+          0 0 0 calc(2 * var(--k)) rgb(255 205 100 / 0.95),
+          0 0 calc(10 * var(--k)) calc(3 * var(--k)) rgb(255 165 30 / 0.6);
+      }
+
+      & .video-controls-content .media-button:active {
+        scale: 0.94;
+      }
+
+      & .video-controls-content .media-button:hover::before {
+        filter: brightness(1.15);
+      }
+
+      /* icon visibility: sprites cover the painted default states */
+      & .phatta-play :is(.media-play-button-play-icon, .media-play-button-pause-icon),
+      & .media-mute-button .media-mute-button-high-icon,
+      & .media-captions-button .media-button-icon,
+      & .media-fullscreen-button .media-fullscreen-button-enter-icon {
+        display: none !important;
+      }
+
+      & .media-mute-button[data-muted] .media-mute-button-off-icon,
+      & .media-fullscreen-button[data-fullscreen] .media-fullscreen-button-exit-icon,
+      & .phatta-play[data-ended] .media-play-button-restart-icon {
+        display: block !important;
+      }
+
+      & .media-mute-button:not([data-muted]) .media-mute-button-off-icon,
+      & .media-fullscreen-button:not([data-fullscreen]) .media-fullscreen-button-exit-icon,
+      & .phatta-play:not([data-ended]) .media-play-button-restart-icon {
+        display: none !important;
+      }
+
+      & .phatta-play[data-ended]::before {
+        background-image: none !important;
+      }
+
+      & .media-captions-button[data-active]::before {
+        filter: sepia(1) saturate(5) hue-rotate(-12deg) brightness(1.05);
+      }
+
+      & .phatta-speed-button::before {
+        display: none;
+      }
+
+      & .video-controls-content .media-button .media-button-icon,
+      & .video-controls-content .media-button .media-button-icon-base {
+        width: calc(22 * var(--k));
+        height: calc(22 * var(--k));
+        min-width: 16px;
+        min-height: 16px;
+        filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.6));
+      }
+
+      /* speed button face: live "1×" in the numeral face */
+      & .phatta-rate {
+        grid-area: 1 / 1;
+        font-family: var(--phatta-num-font);
+        font-weight: 700;
+        font-size: calc(var(--g-rate-fs, 17) * var(--k));
+        line-height: 1;
+        color: var(--phatta-cream);
+        translate: calc(var(--g-rate-dx, 0) * var(--k)) calc(var(--g-rate-dy, 0) * var(--k));
+      }
+
+      /* ── volume: inline brass rail, gold fill, small brass knob ── */
+      & .phatta-clock {
+        display: contents;
+      }
+
+      & .phatta-volume {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      & .media-volume-slider {
+        position: relative;
+        display: block;
+        width: max(var(--panj-target-min), calc(var(--g-vsw) * var(--k)));
+        min-width: var(--panj-target-min);
+        height: var(--panj-target-min);
+        --media-accent: transparent;
+      }
+
+      & .media-volume-slider-track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        bottom: auto;
+        width: auto;
+        height: calc(var(--g-vth) * var(--k));
+        transform: translateY(-50%);
+        border-radius: 0;
+        overflow: visible;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+
+      & .media-volume-slider-fill {
+        position: absolute;
+        inset: 0;
+        width: auto;
+        height: auto;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        clip-path: inset(0 calc(100% - var(--media-slider-fill, 0%)) 0 0);
+      }
+
+      & .media-volume-slider-thumb {
+        left: var(--media-slider-fill, 0%);
+        top: 50%;
+        bottom: auto;
+        width: calc(var(--g-kw) * var(--k));
+        height: calc(var(--g-kw) * var(--k));
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+
+      /* ── sign-painter numerals (live) ── */
+      & .media-time-group {
+        gap: 0;
+        padding: 0;
+        color: var(--phatta-cream);
+        font-family: var(--phatta-num-font);
+        font-weight: 700;
+        font-size: calc(var(--g-tm-fs, 21) * var(--k));
+        letter-spacing: calc(var(--g-tm-ls, 0) * var(--k));
+        font-variant-numeric: lining-nums;
+        line-height: 1;
+      }
+
+      & .media-time-separator {
+        opacity: 1;
+        padding-inline: calc(var(--g-tm-sep, 6) * var(--k));
+      }
+
+      & .media-time-duration-value {
+        opacity: 1;
+      }
+
+      /* ── tooltips, menus, dialog: lacquer with brass trim ── */
+      & .media-tooltip-popup {
+        border-radius: 5px;
+        background: var(--phatta-cream);
+        color: #1a120a;
+        font-family: var(--phatta-tag-font);
+        font-weight: 500;
+        font-size: 13px;
+        box-shadow: 0 0 0 1px #5f4210, 0 3px 8px rgb(0 0 0 / 0.5);
+      }
+
+      & .media-tooltip-shortcut {
+        background: rgb(26 18 10 / 0.12);
+        border-radius: 3px;
+      }
+
+      & .media-menu-popup {
+        /* tall enough for the whole speed list without scrolling (the Scaffold caps it at 224px) */
+        max-height: min(470px, calc(100dvh - 120px));
+        border: 2px solid var(--phatta-brass);
+        border-radius: 14px;
+        background: linear-gradient(180deg, var(--phatta-lacquer-2), var(--phatta-lacquer));
+        color: var(--phatta-cream);
+        box-shadow: 0 0 0 1px #000, 0 12px 28px rgb(0 0 0 / 0.65);
+      }
+
+      & :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item) {
+        border-radius: 8px;
+        background-color: transparent;
+        color: var(--phatta-cream);
+      }
+
+      & :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item)[data-highlighted] {
+        background-color: rgb(245 161 15 / 0.2);
+      }
+
+      & .media-menu-radio-item[aria-checked="true"] {
+        color: var(--phatta-gold);
+        font-weight: 600;
+      }
+
+      & .media-menu-indicator {
+        color: var(--phatta-gold);
+      }
+
+      & .media-menu-badge {
+        background: var(--phatta-red);
+        color: #fff;
+        border-radius: 4px;
+      }
+
+      & .media-dialog-popup {
+        border: 2px solid var(--phatta-brass);
+        border-radius: 14px;
+        background: linear-gradient(180deg, var(--phatta-lacquer-2), var(--phatta-lacquer));
+        color: var(--phatta-cream);
+      }
+
+      & .media-dialog-title {
+        font-weight: 700;
+        color: var(--phatta-gold);
+      }
+
+      & .media-dialog-close {
+        border-radius: 999px;
+        border-color: var(--phatta-brass) !important;
+      }
+
+      & .media-indicator {
+        border: 1px solid rgb(201 154 59 / 0.8);
+        border-radius: 999px;
+        background: rgb(13 10 8 / 0.88);
+        color: var(--phatta-cream);
+        font-weight: 700;
+      }
+
+      & .media-buffering-indicator {
+        color: var(--phatta-gold);
+      }
+
+      /* ── focus: cream ring + black halo, readable over bright and dark ── */
+      & :is(.media-button, .media-time-slider-thumb, .media-volume-slider-thumb, [role="slider"]):focus-visible {
+        outline: var(--panj-focus-width, 3px) solid var(--panj-focus-color, #fff4cc);
+        outline-offset: 2px;
+        box-shadow:
+          0 0 0 calc(2px + var(--panj-focus-width, 3px) + 3px) var(--panj-focus-halo, rgb(0 0 0 / 0.9)),
+          0 0 14px rgb(245 161 15 / 0.6);
+      }
+
+      & :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item):focus-visible {
+        outline: var(--panj-focus-width, 3px) solid var(--panj-focus-color, #fff4cc);
+        outline-offset: -2px;
+        box-shadow: inset 0 0 0 4px var(--panj-focus-halo, rgb(0 0 0 / 0.9));
+      }
+    }
+
+    .media-skin[data-skin="phatta"] video::cue {
+      color: #f7ecd0;
+      background: rgb(13 10 8 / 0.85);
+    }
+  }
+
+  /* ─────────────────────────── flow layout (default) ─────────────────────────── */
+  .media-skin[data-skin="phatta"] {
+    /* captions ride above the (tall) painted strip while it shows */
+    --media-caption-controls-y: -150px;
+
+    & .video-controls-bottom {
+      gap: 0;
+      padding: 0 max(6px, calc(8 * var(--k))) max(6px, calc(8 * var(--k)));
+      background: none;
+      transition: opacity var(--panj-motion-base, 0.2s) ease;
+    }
+
+    /* bead strip with its painted brass end caps, overlapping the top of the lacquer panel */
+    & .video-controls-slider-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      margin-bottom: calc(-12px + 1 * var(--k));
+      padding-inline: calc(var(--g-cap-w) * var(--k));
+      background:
+        var(--phatta-capL) left center / calc(var(--g-cap-w) * var(--k)) calc(var(--g-cap-h) * var(--k)) no-repeat,
+        var(--phatta-capR) right center / calc(var(--g-capR-w) * var(--k)) calc(var(--g-cap-h) * var(--k)) no-repeat;
+    }
+
+    /* lacquer panel: the painted strip, 9-sliced (chrome rim + floral border stretch, corners stay crisp) */
+    & .video-controls-row {
+      gap: 4px;
+      min-height: 60px;
+      padding: 12px 16px 16px;
+      border-style: solid;
+      border-width: calc(15 * var(--k)) calc(16 * var(--k)) calc(22 * var(--k));
+      border-image: var(--phatta-strip) 30 32 44 fill / calc(15 * var(--k)) calc(16 * var(--k)) calc(22 * var(--k));
+      border-color: transparent;
+      background: none;
+    }
+
+    & .video-controls-group {
+      gap: 4px;
+    }
+
+    /* flow buttons are as big as their painted ring (never under 44px) */
+    & .video-controls-content .media-button {
+      width: max(var(--panj-target-min), calc(var(--b-ring-size, var(--g-ring-btn)) * var(--k)));
+      height: max(var(--panj-target-min), calc(var(--b-ring-size, var(--g-ring-btn)) * var(--k)));
+    }
+
+    & .media-time-group {
+      height: var(--panj-target-min);
+      padding-inline: 8px 2px;
+    }
+  }
+
+  /* phones and small embeds: two rows, smaller paint (hit areas stay 44px) */
+  @container media-root (width < 36rem) {
+    .media-skin[data-skin="phatta"]:not(:where([data-phatta-plate]) *) {
+      & .video-controls-row {
+        flex-wrap: wrap;
+        row-gap: 0;
+        padding: 4px 6px 6px;
+      }
+
+      & .video-controls-start {
+        flex: 1 0 100%;
+      }
+
+      & .video-controls-end {
+        margin-inline-start: auto;
+      }
+
+      & .video-controls-group {
+        gap: 0;
+      }
+
+      & .media-time-group {
+        font-size: 17px;
+        padding-inline: 4px 0;
+      }
+
+      & .media-volume-slider {
+        width: 56px;
+      }
+    }
+  }
+
+  @container media-root (width < 22rem) {
+    .media-skin[data-skin="phatta"]:not(:where([data-phatta-plate]) *) {
+      & .media-time-separator,
+      & .media-time-duration-value {
+        display: none;
+      }
+    }
+  }
+
+  /* ─────────────────────────── plate layout (registered on the truck) ─────────────────────────── */
+  :where([data-phatta-plate]) .media-skin[data-skin="phatta"]:not(:fullscreen, :fullscreen > *) {
+    overflow: visible;
+    border-radius: 0;
+    --media-caption-controls-y: 0px;
+
+    & .video-controls-backdrop {
+      display: none;
+    }
+
+    /* the strip is part of the truck: always shown, never auto-hidden */
+    & .video-controls-bottom,
+    & .video-controls-content:not([data-visible]) .video-controls-bottom {
+      position: absolute;
+      inset: 0;
+      display: block;
+      padding: 0;
+      margin: 0;
+      background: none;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    & :is(.video-controls-slider-row, .video-controls-row, .video-controls-group, .phatta-volume, .phatta-clock) {
+      display: contents;
+    }
+
+    & > video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    & .video-controls-bottom :is(.media-button, .media-time-slider, .media-volume-slider, .media-time-group, .media-popup) {
+      pointer-events: auto;
+    }
+
+    & .media-time-slider {
+      position: absolute;
+      left: calc(var(--g-tx) * var(--k));
+      top: calc((var(--g-ty) + var(--g-th) / 2) * var(--k));
+      width: calc(var(--g-tw) * var(--k));
+      translate: 0 -50%;
+      margin: 0;
+      flex: none;
+    }
+
+    & .video-controls-content .media-button {
+      position: absolute;
+      left: calc(var(--b-cx) * var(--k));
+      top: calc(var(--b-cy) * var(--k));
+      width: max(var(--panj-target-min), calc(var(--b-d) * var(--k)));
+      height: max(var(--panj-target-min), calc(var(--b-d) * var(--k)));
+      translate: -50% -50%;
+      background: none;
+    }
+
+    /* tooltips clear the bead strip above the buttons */
+    & .media-tooltip-popup {
+      --media-tooltip-side-offset: calc(36 * var(--k));
+    }
+
+    & .media-volume-slider {
+      position: absolute;
+      left: calc(var(--g-vsx) * var(--k));
+      top: calc(var(--g-vscy) * var(--k));
+      width: max(var(--panj-target-min), calc(var(--g-vsw) * var(--k)));
+      translate: 0 -50%;
+    }
+
+    & .media-time-group {
+      position: absolute;
+      left: calc((var(--g-tmx) + var(--g-tm-dx, 0)) * var(--k));
+      top: calc((var(--g-tmy) + var(--g-tm-dy, 0)) * var(--k));
+      height: calc(var(--g-tmh) * var(--k));
+      padding: 0;
+      border: 0;
+    }
+
+    & .media-time-toggle {
+      display: none;
+    }
+  }
+}
+
+/* ─────────────────────────── standalone ("desk") paint ───────────────────────────
+   The player on its own, from Faizi's standalone reference: rainbow-gradient seek fill stretched over the played
+   part, white condensed numerals, a PiP button, "1.0x" speed face. Picked with [data-phatta-theme="desk"]. */
+@layer phatta {
+  .media-skin[data-skin="phatta"] .media-pip-button {
+    display: none;
+  }
+
+  :where([data-phatta-theme="desk"]) .media-skin[data-skin="phatta"] {
+    & .video-controls-content .media-pip-button:not([data-hidden]) {
+      display: grid;
+    }
+
+    & .media-pip-button .media-button-icon {
+      display: none !important;
+    }
+
+    & .media-pip-button[data-pip] .media-pip-button-exit-icon {
+      display: block !important;
+    }
+
+    & .media-pip-button[data-pip]::before {
+      background-image: none !important;
+    }
+
+    & .media-time-slider-fill {
+      right: auto;
+      width: var(--media-slider-fill, 0%);
+      clip-path: none;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+    & .media-time-slider[data-dragging] .media-time-slider-fill {
+      width: var(--media-slider-pointer, 0%);
+      clip-path: none;
+    }
+
+    & .phatta-tag {
+      display: none;
+    }
+
+    & .media-time-slider-preview-meta {
+      width: auto;
+      height: auto;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgb(10 8 6 / 0.9);
+      box-shadow: 0 0 0 1px rgb(201 154 59 / 0.8);
+    }
+
+    & .media-time-slider-value {
+      color: #fff;
+      font-family: "Phatta Desk", "Roboto Condensed", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    & .media-time-group {
+      justify-content: center;
+      color: #fff;
+      font-family: "Phatta Desk", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
+    }
+
+    & .phatta-rate {
+      font-size: 0;
+      font-family: "Phatta Desk", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
+      color: #fff;
+    }
+
+    & .phatta-rate::before {
+      content: attr(data-desk);
+      font-size: calc(var(--g-rate-fs, 22) * var(--k));
+    }
+  }
+
+  :where([data-phatta-theme="desk"]) :where([data-phatta-plate]) .media-skin[data-skin="phatta"]:not(:fullscreen, :fullscreen > *) .media-time-group {
+    width: calc(var(--g-tmw) * var(--k));
+  }
+}
+
+/* phones: the strip hangs under the video instead of over it, always shown */
+@layer phatta {
+  :where([data-phatta-below]) .media-skin[data-skin="phatta"]:not(:fullscreen, :fullscreen > *) {
+    overflow: visible;
+    --media-caption-controls-y: 0px;
+
+    & .video-controls-backdrop {
+      display: none;
+    }
+
+    & .video-controls-bottom,
+    & .video-controls-content:not([data-visible]) .video-controls-bottom {
+      top: 100%;
+      bottom: auto;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @layer phatta {
+    .media-skin[data-skin="phatta"] .video-controls-content .media-button:active {
+      scale: none;
+    }
+  }
+}

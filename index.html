@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-mode="night" data-phatta-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Phatta · Video.js v10 skin</title>
+    <meta name="description" content="Phatta: Pakistani truck art. A Video.js v10 skin painted onto the back of a Bedford truck." />
+    <!-- Fix the cascade-layer order before any stylesheet loads: the build can emit the shared essentials
+         (@layer utilities) ahead of the Scaffold (@layer base, components), which would flip their priority. -->
+    <style>
+      @layer base, base.theme, base.preset, base.preferences, components, utilities, phatta, phatta-page;
+    </style>
+    <script>
+      // Night is the default; a visitor's own choice is remembered.
+      try {
+        const saved = localStorage.getItem('phatta-mode');
+        if (saved === 'day' || saved === 'night') {
+          document.documentElement.dataset.mode = saved;
+          document.documentElement.dataset.phattaTheme = saved;
+        }
+      } catch {}
+    </script>
+    <link rel="preload" as="image" href="/demo/assets/night/plate@1x.webp" imagesrcset="/demo/assets/night/plate@1x.webp 1x, /demo/assets/night/plate@2x.webp 2x" fetchpriority="high" />
+    <link rel="stylesheet" href="/demo/gallery.css" />
+    <link rel="stylesheet" href="/demo/phatta-page.css" />
+  </head>
+  <body class="ph-page">
+    <main class="ph-main">
+      <h1 class="ph-sr">Phatta: a Pakistani truck-art skin for Video.js</h1>
+
+      <section class="ph-hero" id="top" aria-label="The Phatta player, painted on the back of a truck">
+        <div class="ph-plate" data-phatta-plate>
+          <nav class="ph-nav" aria-label="Phatta">
+            <a class="ph-logo" href="#top" aria-label="Phatta, back to the truck">PHATTA</a>
+            <button class="ph-mode" type="button" aria-pressed="false" aria-label="Day mode">
+              <svg class="ph-mode-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="4.2" fill="currentColor" />
+                <path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              <svg class="ph-mode-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M15.8 3.6a8.6 8.6 0 1 0 4.6 12.9A7 7 0 0 1 15.8 3.6Z" fill="currentColor" />
+              </svg>
+            </button>
+            <a class="ph-link ph-link-skins" href="https://panj-virid.vercel.app/">Skins</a>
+            <a class="ph-link ph-link-about" href="#about">About</a>
+            <a class="ph-link ph-link-github" href="https://github.com/MuhammadFaizan-prog/phatta">GitHub</a>
+          </nav>
+
+          <div class="ph-crown" role="img" aria-label="Truck crown painted “Dekh magar pyar se” (look, but with love)"></div>
+          <div class="ph-glow" aria-hidden="true"></div>
+          <div class="ph-leds" aria-hidden="true">
+            <i style="--x:609;--y:19;--c:#ffd27a;--n:0"></i><i style="--x:767;--y:19;--c:#ffe9a0;--n:1"></i>
+            <i style="--x:670;--y:24;--c:#7ff0a0;--n:2"></i><i style="--x:705;--y:23;--c:#5fdc7a;--n:3"></i>
+            <i style="--x:827;--y:27;--c:#ffe58f;--n:4"></i><i style="--x:551;--y:27;--c:#ffd27a;--n:5"></i>
+            <i style="--x:492;--y:51;--c:#6fb4ff;--n:6"></i><i style="--x:884;--y:52;--c:#96e4ff;--n:7"></i>
+            <i style="--x:366;--y:54;--c:#ff5b6e;--n:8"></i><i style="--x:1010;--y:55;--c:#ff4d55;--n:9"></i>
+            <i style="--x:429;--y:55;--c:#7cff9c;--n:10"></i><i style="--x:948;--y:56;--c:#8dff9e;--n:11"></i>
+            <i style="--x:286;--y:79;--c:#ff4040;--n:12"></i><i style="--x:1089;--y:79;--c:#ff4a4a;--n:13"></i>
+            <i style="--x:195;--y:94;--c:#ffe27a;--n:14"></i><i style="--x:1180;--y:94;--c:#ffe68a;--n:15"></i>
+            <i style="--x:1247;--y:279;--c:#ff4444;--n:16"></i><i style="--x:126;--y:338;--c:#5aa8ff;--n:17"></i>
+            <i style="--x:1249;--y:339;--c:#9ad8ff;--n:18"></i><i style="--x:126;--y:401;--c:#63e07d;--n:19"></i>
+            <i style="--x:128;--y:462;--c:#ff5a5a;--n:20"></i><i style="--x:1247;--y:460;--c:#ffd36a;--n:21"></i>
+          </div>
+          <div class="ph-bells" aria-hidden="true"></div>
+          <div id="stage"></div>
+          <div class="ph-flaps" aria-hidden="true"><span class="ph-flap ph-flap-l"></span><span class="ph-flap ph-flap-r"></span></div>
+        </div>
+      </section>
+
+      <section id="about" class="ph-workshop" aria-labelledby="ph-design-title" tabindex="-1">
+        <img class="ph-workshop-art" src="/demo/assets/workshop.webp" width="1312" height="816" loading="lazy" decoding="async"
+          alt="A truck painter's bench: paint pots, brushes, foil strips and the Phatta player being decorated" />
+        <div class="ph-workshop-text">
+          <h2 id="ph-design-title">Design thinking</h2>
+          <p>
+            Phatta borrows from the painted backs of Pakistani goods trucks: every surface is decorated, yet the road
+            still has to read the plate. So the loud art lives on the truck around the picture, and the controls sit in
+            one calm black-lacquer strip with cream numerals that read over bright and dark footage.
+          </p>
+          <p>
+            The seek bar is <i>chamak-patti</i>, the reflective foil truck artists cut into patterns: gold beads for
+            what you have watched, silver for what is left, a brass ball for the playhead and a cream tag with the time.
+          </p>
+          <p>
+            The paint is raster on purpose. The truck and every control sprite are cut from our own AI-generated
+            reference art, so the page matches it pixel for pixel; the time, the speed and every state stay live
+            Video.js v10 controls with 44&nbsp;px targets, keyboard access and a visible focus ring.
+          </p>
+          <p>
+            The crown reads “Dekh magar pyar se”: look, but with love. The bells sway while the video plays and the
+            lights twinkle at night, and both stay still if you prefer reduced motion.
+          </p>
+          <p>
+            Controls: play/pause, the bead seek bar with a live time tag, mute with an inline brass volume rail,
+            captions, a speed and settings menu, and fullscreen. Keys: Space or K, arrows, Home/End, M, F, C; Esc closes the menu.
+          </p>
+          <p>
+            Built on Video.js v10 (<code>@videojs/html</code> 10.3.0), streaming Mux playback ID
+            <code>BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM</code>.
+            <a href="https://github.com/MuhammadFaizan-prog/phatta">Source and install notes on GitHub</a>.
+          </p>
+          <p><a class="ph-player-link" href="/player.html">See the player on its own →</a></p>
+          <p><a class="ph-back-up" href="#top">Back to the truck ↑</a></p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import '@videojs/html/i18n';
+      import { createSkinnedPlayer } from '/src/index.ts';
+      import { mount } from '/demo/mount.ts';
+      import { initPhattaPage } from '/demo/phatta-page.ts';
+      mount(createSkinnedPlayer);
+      initPhattaPage();
+    </script>
+  </body>
+</html>

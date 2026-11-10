@@ -1,0 +1,66 @@
+/* /phatta/player.html: the Phatta player on its own, registered on Faizi's standalone reference (desk scene). */
+@layer phatta-page {
+  :root { color-scheme: dark; background: #1c1712; }
+  .pp-page { margin: 0; }
+  .pp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* hidden until focused: the reference paints no navigation */
+  .pp-back {
+    position: absolute;
+    z-index: 10;
+    left: 12px;
+    top: 8px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #0d0a08;
+    color: #f3e6c8;
+    font: 15px/44px system-ui, sans-serif;
+    translate: 0 -200%;
+  }
+  .pp-back:focus-visible { translate: none; }
+
+  .pp-plate {
+    position: relative;
+    width: min(100%, calc(100svh * 1376 / 768));
+    min-width: 700px;
+    margin-inline: auto;
+    aspect-ratio: 1376 / 768;
+    container-type: inline-size;
+    background: image-set(url("./assets/desk/plate@1x.webp") 1x, url("./assets/desk/plate@2x.webp") 2x) 0 0 / 100% 100% no-repeat;
+  }
+
+  @media (max-width: 699.98px) {
+    .pp-plate {
+      width: 100%;
+      min-width: 0;
+      aspect-ratio: auto;
+      background: none;
+      padding: 56px 0 24px;
+    }
+  }
+}
+
+/* unlayered: beats the shared gallery.css #stage defaults */
+.pp-plate > #stage {
+  position: absolute;
+  left: calc(235 / 1376 * 100cqw);
+  top: calc(97 / 1376 * 100cqw);
+  width: calc(902 / 1376 * 100cqw);
+  height: calc(444 / 1376 * 100cqw);
+  aspect-ratio: auto;
+  background: #000;
+  --phatta-k: calc(100cqw / 1376);
+}
+
+@media (max-width: 699.98px) {
+  .pp-plate > #stage {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 170px;
+    --phatta-k: 0.7px;
+  }
+}

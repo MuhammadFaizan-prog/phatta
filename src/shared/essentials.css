@@ -1,0 +1,76 @@
+/* P2 essentials, shared by every panj skin (imported after the Scaffold's skin.css).
+   Gates: 44px targets, visible focus over bright and dark video, reduced motion.
+   Lives in the `utilities` layer so it beats the Scaffold's `components` layer without !important. */
+
+@layer utilities {
+  /* ── 44px targets ───────────────────────────────────────────── */
+  .media-skin[data-skin] .media-button {
+    width: max(var(--panj-target-min), calc(var(--media-spacing) * 8));
+    height: max(var(--panj-target-min), calc(var(--media-spacing) * 8));
+  }
+
+  /* The slider root is the pointer target; the visible track stays thin and centred. */
+  .media-skin[data-skin] .media-time-slider {
+    height: var(--panj-target-min);
+  }
+
+  .media-skin[data-skin] .media-volume-popover-popup {
+    min-width: var(--panj-target-min);
+  }
+
+  .media-skin[data-skin] .media-volume-slider {
+    min-width: var(--panj-target-min);
+  }
+
+  .media-skin[data-skin] :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item) {
+    min-height: var(--panj-target-min);
+  }
+
+  .media-skin[data-skin] .media-dialog-close {
+    min-width: var(--panj-target-min);
+    min-height: var(--panj-target-min);
+  }
+
+  /* ── Visible focus: light ring + dark halo, readable on any frame ── */
+  .media-skin[data-skin]
+    :is(
+      .media-button,
+      .media-menu-item,
+      .media-menu-radio-item,
+      .media-menu-back-item,
+      .media-time-slider-thumb,
+      .media-volume-slider-thumb,
+      [role="slider"]
+    ):focus-visible {
+    outline: var(--panj-focus-width) solid var(--panj-focus-color);
+    outline-offset: var(--panj-focus-offset);
+    box-shadow: 0 0 0 calc(var(--panj-focus-offset) + var(--panj-focus-width) + 2px) var(--panj-focus-halo);
+  }
+
+  /* Never hide the controls while keyboard focus is inside them. */
+  .media-skin[data-skin] .video-controls-content:has(:focus-visible) {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (forced-colors: active) {
+    .media-skin[data-skin] :is(.media-button, .media-menu-item, .media-menu-radio-item, [role="slider"]):focus-visible {
+      outline-color: Highlight;
+      box-shadow: none;
+    }
+  }
+
+  /* ── Reduced motion: stop every transition and animation the skin owns ── */
+  @media (prefers-reduced-motion: reduce) {
+    .media-skin[data-skin],
+    .media-skin[data-skin] *,
+    .media-skin[data-skin] *::before,
+    .media-skin[data-skin] *::after {
+      animation-duration: 0s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

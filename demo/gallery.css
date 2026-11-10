@@ -1,0 +1,17 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0d0d0d; color: #f2f2f2; }
+body { margin: 0; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 5px #000; }
+.page { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+.hub-list { list-style: none; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.hub-list a { display: grid; gap: 4px; min-height: 44px; padding: 16px; border: 1px solid #333; border-radius: 8px; text-decoration: none; }
+.hub-list a:hover { border-color: #888; }
+.hub-list span { opacity: 0.75; font-size: 0.9rem; }
+.back { display: inline-flex; align-items: center; min-height: 44px; }
+#stage { width: 100%; aspect-ratio: 16 / 9; background: #000; }
+#stage video-player { display: block; width: 100%; height: 100%; }
+/* Lowest layer + :where() (zero specificity): a fallback only, so each skin's own layout (grid, flex, sizing) wins,
+   whether the skin's CSS is layered or not. */
+@layer base {
+  :where(#stage .media-skin) { display: block; width: 100%; height: 100%; }
+}
