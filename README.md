@@ -3,7 +3,7 @@
 **A Pakistani truck-art skin for the Video.js v10 player.** Built for the Contra × Mux Video.js v10 Skins Design Challenge.
 
 - **Live demo:** https://phatta.vercel.app (no login) · player on its own: `/player.html`
-- **Mux playback ID:** `9H1YMgeKpZMqJuvARY1SYw4B1jDRUedM3RGgT00N5XdE`
+- **Mux playback ID:** `qos02i3gybD02whhZkP8n2PiOwAP6daR5eBzU00NhGEXNs`
 - Built on `@videojs/html@10.3.0` (HTML custom elements + CSS), started from the v10 Scaffold skin via `@videojs/cli skin create`.
 - Part of the [panj](https://github.com/MuhammadFaizan-prog/panj) set of six skins; this repo is Phatta on its own.
 
@@ -39,8 +39,8 @@ import '@videojs/html/i18n';
 import { createSkinnedPlayer } from './src/index.ts'; // copy src/ into your project
 
 const player = createSkinnedPlayer(
-  `<video src="https://stream.mux.com/9H1YMgeKpZMqJuvARY1SYw4B1jDRUedM3RGgT00N5XdE/highest.mp4" playsinline crossorigin preload="metadata"></video>`,
-  'https://image.mux.com/9H1YMgeKpZMqJuvARY1SYw4B1jDRUedM3RGgT00N5XdE/thumbnail.webp',
+  `<video src="https://stream.mux.com/qos02i3gybD02whhZkP8n2PiOwAP6daR5eBzU00NhGEXNs/highest.mp4" playsinline crossorigin preload="metadata"></video>`,
+  'https://image.mux.com/qos02i3gybD02whhZkP8n2PiOwAP6daR5eBzU00NhGEXNs/thumbnail.webp',
 );
 document.querySelector('#stage')!.append(player);
 ```
